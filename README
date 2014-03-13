@@ -1,0 +1,10 @@
+This is the beginning of a README file for the LCMS_parse repo.
+
+These are a couple small pieces of code that help convert, copy, and 
+move some proprietary software ouputs to csv files that are easily imported to 
+data frame like objects in R and the pandas package for python.
+
+Check the first couple lines of each .py file for the various details of 
+each.
+
+
