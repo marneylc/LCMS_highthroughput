@@ -13,21 +13,27 @@ reFiles = sys.argv[1]
 reFolders = sys.argv[2]
 path = sys.argv[3]
 dest = sys.argv[4]
+convert = sys.argv[5]
 """
 
 import os
 import re
 import shutil
 import sys
+import thread
 
+# main function takes boolean for whether you want to convert all files in 
+# destination directory after all files have been moved
 def main():
     reFiles = sys.argv[1]
     reFolders = sys.argv[2]
     path = sys.argv[3]
     dest = sys.argv[4]
+    convert = sys.argv[5]
     os.chdir(path)
     Move(reFiles,reFolders,dest,path)
-    #mzXML_conv(dest)
+    if convert:
+        mzXML_conv(dest)
 
 # copy all files in all folders to destination, 
 # path is a directory containing the folders
@@ -48,25 +54,46 @@ def pygrep(regex,path):
     os.chdir(path) # cd
     filenames = os.listdir(os.getcwd()) # ls
     matches = list()
-    for file in filenames:
-        if re.search(regex,file):
-            matches.append(file)
+    for filename in filenames:
+        if re.search(regex,filename):
+            matches.append(filename)
             
     os.chdir(home)            
     return matches
 
-#copy all files to destination directory
+#copy all files to destination directory in multiple threads
 def cp_all(files,dest):
-    for file in files:
-        shutil.copy(file,dest)
+    i = range(0,len(files),4)
+    for filenum in i:
+        try:
+            thread.start_new_thread(shutil.copy,(files[filenum], dest, ))
+            thread.start_new_thread(shutil.copy,(files[filenum+1], dest, ))
+            thread.start_new_thread(shutil.copy,(files[filenum+2], dest, ))
+            thread.start_new_thread(shutil.copy,(files[filenum+3], dest, ))
+            
+        except:
+            print "Error: unable to start thread for file copy"
+        
+def exe_conv(thread_name, filename):
+    print "Converting " + filename
+    os.system("msconvert " + filename + " --mzXML")
     
-#convert files in destination directory using msconvert
+#convert files in destination directory using msconvert in multiple threads
 def mzXML_conv(dest):
     home = os.getcwd()
     os.chdir(dest)
     files = pygrep("raw",home)
-    for file in files:
-        os.system("msconvert " + file + " --mzXML")
+    i = range(0,len(files),4)
+    for filenum in i:
+        try:
+            thread.start_new_thread(exe_conv,("Thread 1:", files[filenum], ))
+            thread.start_new_thread(exe_conv,("Thread 2:", files[filenum+1], ))
+            thread.start_new_thread(exe_conv,("Thread 3:", files[filenum+2], ))
+            thread.start_new_thread(exe_conv,("Thread 4:", files[filenum+3], ))
+            
+        except:
+           print "Error: unable to start thread for msconvert"
+
     os.chdir(home)
 
-#main()    
+main()
