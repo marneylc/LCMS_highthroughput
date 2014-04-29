@@ -13,8 +13,6 @@ import numpy
 import pandas
 import re
 
-os.chdir("/home/luke/python/data/biocrates/")
-
 def main():
     filename = sys.argv[1] #include full pathname
     sheetname = 'Data Export'
@@ -27,19 +25,6 @@ def main():
     biocrates_lodAdj = lod_set2value(lods_biocrates,biocrates,0)
     biocrates_lodAdj.to_csv(os.path.splitext(filename)[0]+'lodAdj.csv')
 
-"""
-# starting some code to combine multiple plates of data into a single data 
-# frame
-from lcms import pygrep
-filelist = pygrep('lodAdj','.')
-def combine_plates(filelist):
-    dataframes = list()
-    for filename in filelist:
-        dataframes.append(pandas.read_csv(filename))
-    
-    
-    
-"""
 def remove_cals(biocrates):
     calibrants = list()
     for name in biocrates.index:
