@@ -10,7 +10,8 @@ import os
 import re
 import shutil
 import threading
-
+import time
+			
 def filesNfolders(reFiles,reFolders,path):
     FF_dict = dict()
     folders = pygrep(reFolders, path)
