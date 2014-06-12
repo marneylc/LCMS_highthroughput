@@ -20,7 +20,14 @@ os.chdir('C:/github/LCMS_highthroughput/')
 from lcms import *
 from pylab import *
 
-os.chdir('C:/Users/marneyl/Downloads/testconvert/')
+# if you need to convert the wiff file to mzML use the following code
+# this can also be performed in a simple loop
+os.chdir("C:/python/testdata/") # directory where data is
+filename = os.listdir(os.getcwd())[0]
+t = mzML_conv(filename) # open a thread 't' of class mzML_conv
+t.start() # run __init__ for mzML_conv
+
+os.chdir('C:/Users/marneyl/Downloads/testconvert/') # this is the directory of the mrm files now converted to mzML
 files = pygrep('.mzML', '.')
 
 filename = files[2]
@@ -44,7 +51,7 @@ plotSRM('758.6-184', data['transitions'])
 
 # plot all SRMs
 fig2 = figure()
-fig.suptitle(filename)
+fig2.suptitle(filename)
 for cid in data['masses']:
     plotSRM(cid, data['transitions'])
 
@@ -56,7 +63,8 @@ for t in ax.get_yticks():
     sci_yticks.append("%.1E" % t)
 
 ax.set_yticklabels(sci_yticks, fontsize=20)
-show()
+# use show() to plot the chromatograms in a new plotting window
+show() 
 
 def getSRM(filename):
     data = dict()

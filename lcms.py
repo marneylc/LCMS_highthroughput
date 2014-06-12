@@ -42,6 +42,13 @@ class mzXML_conv(threading.Thread):
         threading.Thread.__init__(self)
     def run(self):
         os.system("msconvert " + self.filename + " --mzXML")
+
+class mzML_conv(threading.Thread):
+    def __init__(self,filename):
+        self.filename = filename
+        threading.Thread.__init__(self)
+    def run(self):
+        os.system("msconvert " + self.filename + " --mzML")
         
 class Move(threading.Thread):
     def __init__(self,filename,folder,dest):
