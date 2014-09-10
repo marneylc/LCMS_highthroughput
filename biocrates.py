@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 
 """
+Execute by shell prompt in active directory of xlsx files: python biocrates.py
+
+
+Pulls out all the necessary information from biocrates xlsx export file,
+parses it to a csv file, then turns all values bellow their LOD to zero, and 
+finally normalizes the relative quantification values to the QC1 sample signal.
+
 Created on Wed April 23 17:09:55 2014
 
 @author: marneyl
@@ -14,17 +21,49 @@ import pandas
 import re
 
 def main():
-    filename = sys.argv[1] #include full pathname
-    sheetname = 'Data Export'
-    wb=xlrd.open_workbook(filename)
-    sheet = wb.sheet_by_name(sheetname)
-    lods_biocrates = get_lods(sheet,filename,sheetname)
-    biocrates = get_data(sheet,filename,sheetname)
-    biocrates = remove_cals(biocrates)
-    biocrates.to_csv(os.path.splitext(filename)[0]+'.csv')
-    biocrates_lodAdj = lod_set2value(lods_biocrates,biocrates,0)
-    biocrates_lodAdj.to_csv(os.path.splitext(filename)[0]+'lodAdj.csv')
+    #filename = sys.argv[1] #include full pathname
+    files = pygrep('.xlsx','.')
+    for filename in files:
+		sheetname = 'Data Export'
+		wb=xlrd.open_workbook(filename)
+		sheet = wb.sheet_by_name(sheetname)
+		lods_biocrates = get_lods(sheet,filename,sheetname)
+		wellpos = get_subset(filename,sheetname,[7,12],[sheet.nrows,12],True) # get well positions
+		dates = get_dates(sheet,filename,sheetname)  # get sample run date
+		biocrates = get_data(sheet,filename,sheetname)
+		biocrates['Well_Position'] = wellpos # add in well positions to data frame
+		biocrates['Date'] = dates
+		biocrates = remove_cals(biocrates)
+		biocrates.to_csv(os.path.splitext(filename)[0]+'.csv')
+		biocrates_lodAdj = lod_set2value(lods_biocrates,biocrates,0)
+		biocrates_lodAdj.to_csv(os.path.splitext(filename)[0]+'lodAdj.csv')
+		# split absolute quantification?
+		biocrates_lodAdj_norm = normalize(biocrates_lodAdj, 'MetaDis QC1')
+		biocrates_lodAdj_norm.to_csv(os.path.splitext(filename)[0]+'lodAdj_norm.csv')
 
+
+def normalize(biocrates, reQCsample):
+    # normalizes each value for relative quant metabolites (columns 40 - 81)
+    # uses a regular expression to pull out normalization sample name
+    # will fail if there are multiple matches
+    reQC = list()
+    for name in biocrates.index:
+        if re.search(reQCsample, name):
+            reQC.append(name)
+    if len(reQC) > 1:
+        print("Multiple matches for norm sample regular expression")
+        return False
+    else:
+        biocrates_lodAdj_norm = pandas.DataFrame(index = biocrates.index)
+        reQCdata = biocrates.ix[reQC]
+        absoluteCol = pandas.Series(biocrates.columns[40:82])
+        for column in biocrates.columns:
+            if (absoluteCol.str.contains(column).any() or column == 'Well_Position' or column == 'Date'):
+                biocrates_lodAdj_norm[column] = biocrates[column]
+            else:
+                biocrates_lodAdj_norm[column] = biocrates[column]/reQCdata[column].values
+    return biocrates_lodAdj_norm
+                
 def remove_cals(biocrates):
     calibrants = list()
     for name in biocrates.index:
@@ -55,7 +94,13 @@ def get_lods(sheet,filename,sheetname):
     lods_metabolites = get_subset(filename,sheetname,[2,57],[2,98],True)
     lods_biocrates = pandas.Series(lods, index=lods_metabolites)
     return lods_biocrates
-
+    
+def get_dates(sheet,filename,sheetname):
+    long_dates = get_subset(filename,sheetname,[7,16],[sheet.nrows,16],True)
+    dates=list()    
+    for i in range(len(long_dates)):
+        dates.append(long_dates[i][0:10])
+    return dates
 
 def get_subset(filename, sheetname, topleft, bottomright, string):
     left = topleft[0]; right = bottomright[1]
@@ -88,4 +133,17 @@ def get_subset(filename, sheetname, topleft, bottomright, string):
                     data[row_index-(left), col_index-(top)] = float('nan')
     return data
     
+# kinda like ls | grep in Unix
+def pygrep(regex,path):
+    home = os.getcwd()
+    os.chdir(path) # cd
+    filenames = os.listdir(os.getcwd()) # ls
+    matches = list()
+    for filename in filenames:
+        if re.search(regex,filename):
+            matches.append(filename)
+            
+    os.chdir(home)
+    return matches
+
 main()

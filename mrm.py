@@ -45,15 +45,26 @@ url = "file://" + os.getcwd() + '\\transitions.html'
 webbrowser.open_new_tab(url)
 
 # to plot a single transition
+cid = '218.1-85.1'
 fig1 = figure()
-plotSRM('758.6-184', data['transitions'])
+plotSRM(cid, data['transitions'])
+# get sum of transition
+sumtrans(cid, data['transitions'])
 # use >>> show() to display figure if not in an IDE
 
-# plot all SRMs
+# plot all SRMs and save them to active directory
 fig2 = figure()
 fig2.suptitle(filename)
+os.mkdir('images')
+os.chdir('images')
+os.mkdir('images')
+os.chdir('images')
 for cid in data['masses']:
+    fig1 = figure()
     plotSRM(cid, data['transitions'])
+    filename = 'plot_' + cid + '.png'
+    savefig(filename, bbox_inches='tight')
+    close() # closes figure
 
 # set some parameters for the chromatogram
 ax=gca() # set axis object to ax
@@ -86,6 +97,9 @@ def getSRM(filename):
 
 def plotSRM(cid, transitions):
     plot(transitions[cid][0],transitions[cid][1],)
+    
+def sumtrans(cid, transitions):
+    return sum(transitions[cid][1])
 
 
 
