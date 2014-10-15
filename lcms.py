@@ -51,16 +51,14 @@ class mzML_conv(threading.Thread):
         os.system("msconvert " + self.filename + " --mzML")
         
 class Move(threading.Thread):
-    def __init__(self,filename,folder,dest):
-        self.filename = filename
-        self.folder = folder
-        self.dest = dest
-        threading.Thread.__init__(self)
-    def run(self):
-        home = os.getcwd()
-        os.chdir(self.folder)
-        shutil.copy(self.filename, self.dest)
-        os.chdir(home)
+	def __init__(self,filename,folder,path2folders,dest):
+		self.filename = filename
+		self.folder = folder
+		self.path2folders = path2folders
+		self.dest = dest
+		threading.Thread.__init__(self)
+	def run(self):
+		shutil.copy(self.path2folders + '/' + self.folder + '/' + self.filename, self.dest)
 
 # only works in unix environments        
 class R_hrms(threading.Thread):
