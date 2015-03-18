@@ -23,9 +23,8 @@
 # source('plate2384')
 # main()
 #
-# or for command line nerds run:
-# Rscript plate2384.R
-#
+# you may need to use the absolute path to the plate2384.R file
+# if your xlsx files are in a different directory than it.
 
 require(xlsx)
 
