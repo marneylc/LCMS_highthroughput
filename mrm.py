@@ -16,6 +16,7 @@ import os
 import pandas
 import matplotlib
 import webbrowser
+import shutil
 os.chdir('C:/github/LCMS_highthroughput/')
 from lcms import *
 from pylab import *
@@ -52,11 +53,14 @@ plotSRM(cid, data['transitions'])
 sumtrans(cid, data['transitions'])
 # use >>> show() to display figure if not in an IDE
 
+# could make a new directory with filename:
+os.makedirs(os.path.splitext(filename)[0])
+shutil.move('transitions.html',os.path.splitext(filename)[0] + '/' + 'transitions.html') # move html transitions to folder
+os.chdir(os.path.splitext(filename)[0])
+
 # plot all SRMs and save them to active directory
 fig2 = figure()
 fig2.suptitle(filename)
-os.mkdir('images')
-os.chdir('images')
 os.mkdir('images')
 os.chdir('images')
 for cid in data['masses']:

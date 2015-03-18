@@ -8,9 +8,12 @@ Created on Tue Apr 29 11:57:59 2014
 import os
 import pandas
 import re
+import sys
 
 def main():
-    dframes = bigDF("/home/luke/Dropbox/biocrates/metIDQ_results/afterCurtainExp/",'lodAdj')
+    reFile = sys.argv[1] # to combine all lod adjusted files use lodAdj
+    wherethefiles = os.getcwd()
+    dframes = bigDF(wherethefiles,reFile)
 
 def bigDF(path2files,refiles):
     home = os.getcwd()
