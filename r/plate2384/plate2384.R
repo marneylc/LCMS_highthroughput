@@ -1,5 +1,5 @@
-# The following code is for handling the transfering of 4, 96-well plates
-# to a 384 well plate in four quandrants that would be convient for pipetting:
+# The following code is for handling the transferring of 4, 96-well plates
+# to a 384 well plate in four quadrants that would be convenient for pipetting:
 #
 #        |
 #   1    |   2
