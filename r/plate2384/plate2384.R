@@ -7,7 +7,7 @@
 #        |
 #-----------------
 #        |
-#   4    |   3
+#   3    |   4
 #        |  
 #
 # The files you select MUST GO IN THIS ORDER!
@@ -48,12 +48,14 @@ main <- function() {
   plate384 <- insert_quadrant(plate96=plate2,plate384=plate384,p384_rowIx=seq(1,16,2),p384_colIx=seq(2,24,2))
   
   # quadrant 3
+  plate4 <- read.xlsx2(xlsfile4,1)
+  plate384 <- insert_quadrant(plate96=plate4,plate384=plate384,p384_rowIx=seq(2,16,2),p384_colIx=seq(1,24,2))
+  
+  # quadrant 4
   plate3 <- read.xlsx2(xlsfile3,1)
   plate384 <- insert_quadrant(plate96=plate3,plate384=plate384,p384_rowIx=seq(2,16,2),p384_colIx=seq(2,24,2))
   
-  # quadrant 4
-  plate4 <- read.xlsx2(xlsfile4,1)
-  plate384 <- insert_quadrant(plate96=plate4,plate384=plate384,p384_rowIx=seq(2,16,2),p384_colIx=seq(1,24,2))
+  
   
   # get indices for each entry
   for (j in 1:16) {
