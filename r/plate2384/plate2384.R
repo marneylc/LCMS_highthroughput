@@ -77,7 +77,8 @@ main <- function() {
 }
 
 insert_quadrant <- function(plate96,plate384,p384_rowIx,p384_colIx) {
-  p <- matrix(plate96$ID, nrow = 8)
+  p <- matrix(plate96[,1], nrow = 12)
+  p<-t(p)
   j<-1
   for (i in p384_colIx) {
     plate384[p384_rowIx,i] <- p[,j]
